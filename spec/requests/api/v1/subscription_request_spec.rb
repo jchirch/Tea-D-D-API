@@ -17,7 +17,7 @@ RSpec.describe "Subscription Endpoints" do
       expect(response).to be_successful
 
       subscriptions = JSON.parse(response.body, symbolize_names: true)[:data]
-
+     
       subscriptions.each do |sub|
         expect(sub).to have_key(:id)
         expect(sub[:type]).to eq("subscription")
@@ -34,7 +34,7 @@ RSpec.describe "Subscription Endpoints" do
       expect(response).to be_successful
 
       subscription = JSON.parse(response.body, symbolize_names: true)[:data]
-      # require 'pry'; binding.pry
+
       expect(subscription).to have_key(:id)
       expect(subscription[:type]).to eq("subscription")
       expect(subscription[:attributes][:title]).to eq(@subscription1.title)
@@ -44,6 +44,19 @@ RSpec.describe "Subscription Endpoints" do
 
       expect(subscription[:relationships][:tea][:data][:id].to_i).to eq(@tea1.id)
       expect(subscription[:relationships][:customer][:data][:id].to_i).to eq(@customer1.id)
+    end
+
+    it 'cancels a subscription to render it inactive' do
+     
+      expect(@subscription1.activestatus).to eq(true)
+
+      cancel_params = {subscription: {activestatus: false}}
+            
+      patch "/api/v1/subscriptions/#{@subscription1.id}", params: cancel_params
+      expect(response).to be_successful
+
+      @subscription1.reload
+      expect(@subscription1.activestatus).to eq(false)
     end
   end 
 end

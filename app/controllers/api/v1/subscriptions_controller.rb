@@ -10,4 +10,29 @@ class Api::V1::SubscriptionsController < ApplicationController
     render json: { error: "Subscription not found" }, status: :not_found
   end
 
+  def update
+    @subscription = Subscription.find_by(id: params[:id])
+    if @subscription.update(subscription_params)
+      render json: SubscriptionSerializer.new(@subscription)
+    else
+      error_response = {
+        message: "Could not make changes to your subscription at this time",
+        errors: @subscription.errors.full_messages
+      }
+      render json: error_response, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def subscription_params
+    params.require(:subscription).permit(:title, :price, :activestatus, :frequency)
+  end
+
+  def find_subscription
+    @subscription = Subscription.find(params[:id])
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: "Subscription not found" }, status: :not_found
+  end
+
 end
