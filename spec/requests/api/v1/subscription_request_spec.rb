@@ -59,4 +59,23 @@ RSpec.describe "Subscription Endpoints" do
       expect(@subscription1.activestatus).to eq(false)
     end
   end 
+
+  describe 'Sad paths' do
+    it 'returns error from invalid show action' do
+      get "/api/v1/subscriptions/0"
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+    end
+
+    it 'returns error from invalid update action' do
+      example_params = {subscription: {price: "potato"}}
+            
+      patch "/api/v1/subscriptions/#{@subscription1.id}", params: example_params
+      expect(response).to_not be_successful
+      error_response = JSON.parse(response.body, symbolize_names: true) 
+      expect(error_response[:message]).to eq("Could not make changes to your subscription at this time")
+      expect(error_response[:errors]).to eq(["Price Price must be a number."])
+    end
+  end
 end

@@ -29,10 +29,4 @@ class Api::V1::SubscriptionsController < ApplicationController
     params.require(:subscription).permit(:title, :price, :activestatus, :frequency)
   end
 
-  def find_subscription
-    @subscription = Subscription.find(params[:id])
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { error: "Subscription not found" }, status: :not_found
-  end
-
 end
