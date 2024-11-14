@@ -11,13 +11,13 @@ class Api::V1::SubscriptionsController < ApplicationController
   end
 
   def update
-    @subscription = Subscription.find_by(id: params[:id])
-    if @subscription.update(subscription_params)
-      render json: SubscriptionSerializer.new(@subscription)
+    subscription = Subscription.find_by(id: params[:id])
+    if subscription.update(subscription_params)
+      render json: SubscriptionSerializer.new(subscription)
     else
       error_response = {
         message: "Could not make changes to your subscription at this time",
-        errors: @subscription.errors.full_messages
+        errors: subscription.errors.full_messages
       }
       render json: error_response, status: :unprocessable_entity
     end
